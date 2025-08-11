@@ -225,15 +225,19 @@ eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
 
 1. **Prérequis**
 
-   - Java 24
+   - Java 17
    - Maven
    - PostgreSQL
-   - Eureka Server (optionnel)
+   - Eureka Server
 
 2. **Base de données**
 
    ```sql
-   CREATE DATABASE ecommerce_stock;
+   -- Créer la base de données
+   CREATE DATABASE stock_service;
+
+   -- Ou utiliser le script fourni
+   -- psql -U postgres -f create-database.sql
    ```
 
 3. **Compilation et démarrage**

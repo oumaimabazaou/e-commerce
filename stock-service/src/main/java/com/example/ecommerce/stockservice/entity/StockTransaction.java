@@ -12,38 +12,41 @@ public class StockTransaction {
     @Column(name = "id_transaction")
     private Integer idTransaction;
 
-    @Column(name = "id_produit")
+    @Column(name = "id_produit", nullable = false)
     private Integer idProduit;
 
-    @Column(name = "id_stock")
-    private Integer idStock;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_stock", nullable = false)
+    private Stock stock;
 
-    @Column(name = "type")
-    private String type; // "ENTREE", "SORTIE", "AJUSTEMENT", "RETOUR"
+    @Column(name = "type", nullable = false)
+    private String type;
 
-    @Column(name = "quantity")
+    @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
-    @Column(name = "transaction_date")
+    @Column(name = "transaction_date", nullable = false)
     private LocalDateTime transactionDate;
 
-    @Column(name = "prix_unitaire")
+    @Column(name = "prix_unitaire", nullable = false)
     private BigDecimal prixUnitaire;
 
-    @Column(name = "revenu_total")
+    @Column(name = "revenu_total", nullable = false)
     private BigDecimal revenuTotal;
 
     @Column(name = "notes")
     private String notes;
 
-    // Constructeurs
     public StockTransaction() {
     }
 
-    public StockTransaction(Integer idProduit, Integer idStock, String type, Integer quantity,
-            BigDecimal prixUnitaire, String notes) {
+    public StockTransaction(Integer idProduit, Stock stock, String type, Integer quantity, BigDecimal prixUnitaire, String notes) {
+        if (idProduit == null || stock == null || stock.getIdStock() == null || type == null || quantity == null || quantity <= 0 ||
+                prixUnitaire == null || prixUnitaire.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Les champs idProduit, stock, type, quantity, et prixUnitaire sont requis et doivent être valides.");
+        }
         this.idProduit = idProduit;
-        this.idStock = idStock;
+        this.stock = stock;
         this.type = type;
         this.quantity = quantity;
         this.prixUnitaire = prixUnitaire;
@@ -52,7 +55,6 @@ public class StockTransaction {
         this.revenuTotal = prixUnitaire.multiply(BigDecimal.valueOf(quantity));
     }
 
-    // Getters et Setters
     public Integer getIdTransaction() {
         return idTransaction;
     }
@@ -69,12 +71,12 @@ public class StockTransaction {
         this.idProduit = idProduit;
     }
 
-    public Integer getIdStock() {
-        return idStock;
+    public Stock getStock() {
+        return stock;
     }
 
-    public void setIdStock(Integer idStock) {
-        this.idStock = idStock;
+    public void setStock(Stock stock) {
+        this.stock = stock;
     }
 
     public String getType() {
@@ -123,20 +125,5 @@ public class StockTransaction {
 
     public void setNotes(String notes) {
         this.notes = notes;
-    }
-
-    @Override
-    public String toString() {
-        return "StockTransaction{" +
-                "idTransaction=" + idTransaction +
-                ", idProduit=" + idProduit +
-                ", idStock=" + idStock +
-                ", type='" + type + '\'' +
-                ", quantity=" + quantity +
-                ", transactionDate=" + transactionDate +
-                ", prixUnitaire=" + prixUnitaire +
-                ", revenuTotal=" + revenuTotal +
-                ", notes='" + notes + '\'' +
-                '}';
     }
 }

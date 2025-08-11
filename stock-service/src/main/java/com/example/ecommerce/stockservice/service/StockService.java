@@ -23,90 +23,77 @@ public class StockService {
     @Autowired
     private StockTransactionRepository stockTransactionRepository;
 
-    // === GESTION DES STOCKS ===
-
-    /**
-     * Créer un nouveau stock
-     */
     public Stock createStock(Stock stock) {
+        if (stock.getQuantiteDisponible() == null || stock.getQuantiteDisponible() < 0) {
+            throw new IllegalArgumentException("La quantité disponible doit être positive.");
+        }
         stock.setDerniereMaj(LocalDateTime.now());
         return stockRepository.save(stock);
     }
 
-    /**
-     * Obtenir un stock par son ID
-     */
     public Optional<Stock> getStockById(Integer idStock) {
         return stockRepository.findById(idStock);
     }
 
-    /**
-     * Obtenir le stock d'un produit dans une boutique
-     */
     public Optional<Stock> getStockByProduitAndBoutique(Integer idProduit, Integer idBoutique) {
         return stockRepository.findByIdProduitAndIdBoutique(idProduit, idBoutique);
     }
 
-    /**
-     * Obtenir tous les stocks d'une boutique
-     */
     public List<Stock> getStocksByBoutique(Integer idBoutique) {
         return stockRepository.findByIdBoutique(idBoutique);
     }
 
-    /**
-     * Obtenir tous les stocks d'un produit
-     */
     public List<Stock> getStocksByProduit(Integer idProduit) {
         return stockRepository.findByIdProduit(idProduit);
     }
 
-    /**
-     * Mettre à jour un stock
-     */
     public Stock updateStock(Stock stock) {
+        if (stock.getIdStock() == null) {
+            throw new IllegalArgumentException("L'ID du stock est requis pour la mise à jour.");
+        }
         stock.setDerniereMaj(LocalDateTime.now());
         return stockRepository.save(stock);
     }
 
-    /**
-     * Supprimer un stock
-     */
     public void deleteStock(Integer idStock) {
         stockRepository.deleteById(idStock);
     }
 
-    // === GESTION DES QUANTITÉS ===
-
-    /**
-     * Ajouter de la quantité au stock
-     */
     public Stock ajouterQuantite(Integer idStock, Integer quantite, BigDecimal prixUnitaire, String notes) {
+        if (quantite == null || quantite <= 0) {
+            throw new IllegalArgumentException("La quantité à ajouter doit être positive.");
+        }
+        if (prixUnitaire == null || prixUnitaire.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Le prix unitaire doit être positif.");
+        }
         Optional<Stock> stockOpt = stockRepository.findById(idStock);
         if (stockOpt.isPresent()) {
             Stock stock = stockOpt.get();
             stock.setQuantiteDisponible(stock.getQuantiteDisponible() + quantite);
             stock.setDerniereMaj(LocalDateTime.now());
 
-            // Créer une transaction d'entrée
             StockTransaction transaction = new StockTransaction(
                     stock.getIdProduit(),
-                    stock.getIdStock(),
+                    stock,
                     "ENTREE",
                     quantite,
                     prixUnitaire,
-                    notes);
+                    notes
+            );
             stockTransactionRepository.save(transaction);
 
             return stockRepository.save(stock);
         }
-        throw new RuntimeException("Stock non trouvé avec l'ID: " + idStock);
+        throw new IllegalArgumentException("Stock non trouvé avec l'ID: " + idStock);
     }
 
-    /**
-     * Retirer de la quantité du stock
-     */
     public Stock retirerQuantite(Integer idStock, Integer quantite, BigDecimal prixUnitaire, String notes) {
+        if (quantite == null || quantite <= 0) {
+            throw new IllegalArgumentException("La quantité à retirer doit être positive.");
+        }
+        if (prixUnitaire == null || prixUnitaire.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Le prix unitaire doit être positif.");
+        }
         Optional<Stock> stockOpt = stockRepository.findById(idStock);
         if (stockOpt.isPresent()) {
             Stock stock = stockOpt.get();
@@ -114,29 +101,29 @@ public class StockService {
                 stock.setQuantiteDisponible(stock.getQuantiteDisponible() - quantite);
                 stock.setDerniereMaj(LocalDateTime.now());
 
-                // Créer une transaction de sortie
                 StockTransaction transaction = new StockTransaction(
                         stock.getIdProduit(),
-                        stock.getIdStock(),
+                        stock,
                         "SORTIE",
                         quantite,
                         prixUnitaire,
-                        notes);
+                        notes
+                );
                 stockTransactionRepository.save(transaction);
 
                 return stockRepository.save(stock);
             } else {
-                throw new RuntimeException("Quantité insuffisante en stock. Disponible: "
+                throw new IllegalArgumentException("Quantité insuffisante en stock. Disponible: "
                         + stock.getQuantiteDisponible() + ", Demandé: " + quantite);
             }
         }
-        throw new RuntimeException("Stock non trouvé avec l'ID: " + idStock);
+        throw new IllegalArgumentException("Stock non trouvé avec l'ID: " + idStock);
     }
 
-    /**
-     * Ajuster la quantité du stock (pour corrections)
-     */
     public Stock ajusterQuantite(Integer idStock, Integer nouvelleQuantite, String notes) {
+        if (nouvelleQuantite == null || nouvelleQuantite < 0) {
+            throw new IllegalArgumentException("La nouvelle quantité doit être positive.");
+        }
         Optional<Stock> stockOpt = stockRepository.findById(idStock);
         if (stockOpt.isPresent()) {
             Stock stock = stockOpt.get();
@@ -144,79 +131,58 @@ public class StockService {
             stock.setQuantiteDisponible(nouvelleQuantite);
             stock.setDerniereMaj(LocalDateTime.now());
 
-            // Créer une transaction d'ajustement
+            BigDecimal prixUnitaire = stock.getPrixUnitaire();
+            if (prixUnitaire == null) {
+                throw new IllegalArgumentException("Le prix unitaire du stock n'est pas défini.");
+            }
+
+            String type = difference >= 0 ? "AJUSTEMENT_ENTREE" : "AJUSTEMENT_SORTIE";
             StockTransaction transaction = new StockTransaction(
                     stock.getIdProduit(),
-                    stock.getIdStock(),
-                    "AJUSTEMENT",
+                    stock,
+                    type,
                     Math.abs(difference),
-                    BigDecimal.ZERO,
-                    notes + " (Ancienne quantité: " + (stock.getQuantiteDisponible() - difference) + ")");
+                    prixUnitaire,
+                    notes + " (Ancienne quantité: " + (stock.getQuantiteDisponible() - difference) + ")"
+            );
             stockTransactionRepository.save(transaction);
 
             return stockRepository.save(stock);
         }
-        throw new RuntimeException("Stock non trouvé avec l'ID: " + idStock);
+        throw new IllegalArgumentException("Stock non trouvé avec l'ID: " + idStock);
     }
 
-    // === ALERTES ET SURVEILLANCE ===
-
-    /**
-     * Obtenir les stocks en rupture (quantité <= seuil critique)
-     */
     public List<Stock> getStocksEnRupture() {
         return stockRepository.findStocksEnRupture();
     }
 
-    /**
-     * Obtenir les stocks en rupture d'une boutique
-     */
     public List<Stock> getStocksEnRuptureByBoutique(Integer idBoutique) {
         return stockRepository.findStocksEnRuptureByBoutique(idBoutique);
     }
 
-    /**
-     * Vérifier si un stock est en rupture
-     */
     public boolean isStockEnRupture(Integer idStock) {
         Optional<Stock> stockOpt = stockRepository.findById(idStock);
         return stockOpt.map(stock -> stock.getQuantiteDisponible() <= stock.getSeuilCritique()).orElse(false);
     }
 
-    /**
-     * Vérifier si un stock est épuisé
-     */
     public boolean isStockEpuise(Integer idStock) {
         Optional<Stock> stockOpt = stockRepository.findById(idStock);
         return stockOpt.map(stock -> stock.getQuantiteDisponible() <= 0).orElse(false);
     }
 
-    // === STATISTIQUES ===
-
-    /**
-     * Compter le nombre de produits en stock pour une boutique
-     */
     public Long countProduitsEnStockByBoutique(Integer idBoutique) {
         return stockRepository.countProduitsEnStockByBoutique(idBoutique);
     }
 
-    /**
-     * Calculer la valeur totale du stock d'une boutique
-     */
     public Long getValeurTotaleStockByBoutique(Integer idBoutique) {
-        return stockRepository.getValeurTotaleStockByBoutique(idBoutique);
+        BigDecimal valeur = stockRepository.getValeurTotaleStockByBoutique(idBoutique);
+        return valeur != null ? valeur.longValue() : 0L;
     }
 
-    /**
-     * Obtenir les stocks par statut
-     */
     public List<Stock> getStocksByStatut(String statut) {
         return stockRepository.findByStatut(statut);
     }
 
-    /**
-     * Obtenir les stocks d'une boutique par statut
-     */
     public List<Stock> getStocksByBoutiqueAndStatut(Integer idBoutique, String statut) {
         return stockRepository.findByIdBoutiqueAndStatut(idBoutique, statut);
     }

@@ -13,22 +13,23 @@ public class Promotion {
     @Column(name = "id_boutique", nullable = false)
     private Integer idBoutique;
 
+    @Column(nullable = false)
     private String nom;
 
     private String description;
 
     private Double pourcentage;
 
-    @Column(name = "date_debut")
+    @Column(name = "date_debut", nullable = false)
     private LocalDateTime dateDebut;
 
-    @Column(name = "date_fin")
+    @Column(name = "date_fin", nullable = false)
     private LocalDateTime dateFin;
 
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "VARCHAR(255)")
     private String produitsEligibles;
 
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "VARCHAR(255)")
     private String conditionsUtilisation;
 
     @Column(name = "utilisations_max")
