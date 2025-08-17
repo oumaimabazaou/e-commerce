@@ -17,7 +17,7 @@ public class UtilisateurService {
         return utilisateurRepository.findAll();
     }
 
-    public Optional<Utilisateur> findById(String id) {
+    public Optional<Utilisateur> findById(Long id) { // <-- CORRECTION : Long seulement
         return utilisateurRepository.findById(id);
     }
 
@@ -25,7 +25,11 @@ public class UtilisateurService {
         return utilisateurRepository.save(utilisateur);
     }
 
-    public void deleteById(String id) {
+    public void deleteById(Long id) { // <-- CORRECTION : Une seule méthode avec Long
         utilisateurRepository.deleteById(id);
     }
-} 
+
+    public Optional<Utilisateur> findByEmail(String email) {
+        return utilisateurRepository.findByEmail(email);
+    }
+}

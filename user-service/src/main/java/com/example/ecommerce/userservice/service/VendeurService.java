@@ -17,7 +17,7 @@ public class VendeurService {
         return vendeurRepository.findAll();
     }
 
-    public Optional<Vendeur> findById(String id) {
+    public Optional<Vendeur> findById(Long id) { // Changé de String à Long
         return vendeurRepository.findById(id);
     }
 
@@ -25,7 +25,7 @@ public class VendeurService {
         return vendeurRepository.save(vendeur);
     }
 
-    public void deleteById(String id) {
+    public void deleteById(Long id) { // Changé de String à Long
         vendeurRepository.deleteById(id);
     }
-} 
+}

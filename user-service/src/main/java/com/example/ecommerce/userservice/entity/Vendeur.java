@@ -7,9 +7,11 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "vendeur")
 public class Vendeur {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_vendeur")
-    private String idVendeur;
+    private Long idVendeur; // Changé de String à Long
 
     @OneToOne
     @JoinColumn(name = "id_utilisateur")
@@ -21,10 +23,13 @@ public class Vendeur {
     private BigDecimal chiffreAffaires;
     private LocalDateTime dateVerification;
     private Boolean verifie;
-    // Getters, setters, constructeurs
 
-    public String getIdVendeur() { return idVendeur; }
-    public void setIdVendeur(String idVendeur) { this.idVendeur = idVendeur; }
+    // Constructeur par défaut
+    public Vendeur() {}
+
+    // Getters et setters
+    public Long getIdVendeur() { return idVendeur; }
+    public void setIdVendeur(Long idVendeur) { this.idVendeur = idVendeur; }
     public Utilisateur getUtilisateur() { return utilisateur; }
     public void setUtilisateur(Utilisateur utilisateur) { this.utilisateur = utilisateur; }
     public String getNumeroIce() { return numeroIce; }
@@ -39,4 +44,4 @@ public class Vendeur {
     public void setDateVerification(LocalDateTime dateVerification) { this.dateVerification = dateVerification; }
     public Boolean getVerifie() { return verifie; }
     public void setVerifie(Boolean verifie) { this.verifie = verifie; }
-} 
+}

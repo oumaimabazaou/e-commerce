@@ -7,29 +7,68 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "utilisateur")
 public class Utilisateur {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_utilisateur")
-    private String idUtilisateur;
+    private Long idUtilisateur;
+
     private String nom;
     private String prenom;
+
+    @Column(unique = true, nullable = false)
     private String email;
+
     private String telephone;
+
+    @Column(nullable = false)
     private String motDePasse;
+
+    @Column(nullable = false)
     private String typeUtilisateur;
+
+    @Column(name = "date_creation")
     private LocalDateTime dateCreation;
+
+    @Column(name = "derniere_connexion")
     private LocalDateTime derniereConnexion;
-    private Boolean actif;
+
+    private Boolean actif = true;
+
+    @Column(name = "adresse_complete")
     private String adresseComplete;
+
     private BigDecimal latitude;
     private BigDecimal longitude;
     private String ville;
-    private String codePostal;
-    private String pays;
-    private String photoProfil;
-    // Getters, setters, constructeurs
 
-    public String getIdUtilisateur() { return idUtilisateur; }
-    public void setIdUtilisateur(String idUtilisateur) { this.idUtilisateur = idUtilisateur; }
+    @Column(name = "code_postal")
+    private String codePostal;
+
+    private String pays;
+
+    @Column(name = "photo_profil")
+    private String photoProfil;
+
+    public Utilisateur() {
+        this.dateCreation = LocalDateTime.now();
+    }
+
+    public Utilisateur(String name, String email, String motDePasse, String telephone, String adresseComplete, String typeUtilisateur) {
+        this();
+        String[] nameParts = name.split(" ");
+        this.nom = nameParts[0];
+        this.prenom = nameParts.length > 1 ? nameParts[1] : "";
+        this.email = email;
+        this.motDePasse = motDePasse;
+        this.telephone = telephone;
+        this.adresseComplete = adresseComplete;
+        this.typeUtilisateur = typeUtilisateur;
+    }
+
+    // Getters et setters
+    public Long getIdUtilisateur() { return idUtilisateur; }
+    public void setIdUtilisateur(Long idUtilisateurl) { this.idUtilisateur = idUtilisateur; }
     public String getNom() { return nom; }
     public void setNom(String nom) { this.nom = nom; }
     public String getPrenom() { return prenom; }
@@ -62,4 +101,4 @@ public class Utilisateur {
     public void setPays(String pays) { this.pays = pays; }
     public String getPhotoProfil() { return photoProfil; }
     public void setPhotoProfil(String photoProfil) { this.photoProfil = photoProfil; }
-} 
+}

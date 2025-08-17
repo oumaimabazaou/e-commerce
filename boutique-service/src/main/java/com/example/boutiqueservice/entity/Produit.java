@@ -26,16 +26,16 @@ public class Produit {
 
     private Double prix;
 
-    @Column(name = "code_barre")
+    @Column(name = "code_barre", unique = true) // Ajout d'une contrainte unique si applicable
     private String codeBarre;
 
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "VARCHAR(255)") // Ajusté pour compatibilité
     private String photos;
 
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "VARCHAR(255)") // Ajusté pour compatibilité
     private String videos;
 
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "VARCHAR(255)") // Ajusté pour compatibilité
     private String dimensions;
 
     private Double poids;

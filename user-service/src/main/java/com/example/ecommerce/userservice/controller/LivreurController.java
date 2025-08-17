@@ -20,7 +20,7 @@ public class LivreurController {
     }
 
     @GetMapping("/{id}")
-    public Optional<Livreur> getById(@PathVariable String id) {
+    public Optional<Livreur> getById(@PathVariable Long id) { // Changé de String à Long
         return livreurService.findById(id);
     }
 
@@ -30,13 +30,13 @@ public class LivreurController {
     }
 
     @PutMapping("/{id}")
-    public Livreur update(@PathVariable String id, @RequestBody Livreur livreur) {
+    public Livreur update(@PathVariable Long id, @RequestBody Livreur livreur) { // Changé de String à Long
         livreur.setIdLivreur(id);
         return livreurService.save(livreur);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable String id) {
+    public void delete(@PathVariable Long id) { // Changé de String à Long
         livreurService.deleteById(id);
     }
-} 
+}

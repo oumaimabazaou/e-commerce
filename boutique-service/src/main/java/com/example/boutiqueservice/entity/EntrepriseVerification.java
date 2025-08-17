@@ -10,8 +10,10 @@ public class EntrepriseVerification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idEntrepriseVerif;
 
+    @Column(nullable = false)
     private String nom;
 
+    @Column(nullable = false)
     private String adresse;
 
     @Column(name = "email_contact")
@@ -22,7 +24,7 @@ public class EntrepriseVerification {
 
     private String pays;
 
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "VARCHAR(255)") // Ajusté pour compatibilité si JSON non supporté nativement
     private String documentsRequis;
 
     @Column(name = "created_at")

@@ -1,6 +1,7 @@
 package com.example.ecommerce.stockservice.entity;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -26,6 +27,9 @@ public class Stock {
     @Column(name = "capacite_maximale")
     private Integer capaciteMaximale;
 
+    @Column(name = "prix_unitaire")
+    private BigDecimal prixUnitaire;
+
     @Column(name = "derniere_maj")
     private LocalDateTime derniereMaj;
 
@@ -35,23 +39,22 @@ public class Stock {
     @Column(name = "location")
     private String location;
 
-    // Constructeurs
     public Stock() {
     }
 
     public Stock(Integer idProduit, Integer idBoutique, Integer quantiteDisponible,
-            Integer seuilCritique, Integer capaciteMaximale, String statut, String location) {
+                 Integer seuilCritique, Integer capaciteMaximale, BigDecimal prixUnitaire, String statut, String location) {
         this.idProduit = idProduit;
         this.idBoutique = idBoutique;
         this.quantiteDisponible = quantiteDisponible;
         this.seuilCritique = seuilCritique;
         this.capaciteMaximale = capaciteMaximale;
+        this.prixUnitaire = prixUnitaire;
         this.statut = statut;
         this.location = location;
         this.derniereMaj = LocalDateTime.now();
     }
 
-    // Getters et Setters
     public Integer getIdStock() {
         return idStock;
     }
@@ -100,6 +103,14 @@ public class Stock {
         this.capaciteMaximale = capaciteMaximale;
     }
 
+    public BigDecimal getPrixUnitaire() {
+        return prixUnitaire;
+    }
+
+    public void setPrixUnitaire(BigDecimal prixUnitaire) {
+        this.prixUnitaire = prixUnitaire;
+    }
+
     public LocalDateTime getDerniereMaj() {
         return derniereMaj;
     }
@@ -133,6 +144,7 @@ public class Stock {
                 ", quantiteDisponible=" + quantiteDisponible +
                 ", seuilCritique=" + seuilCritique +
                 ", capaciteMaximale=" + capaciteMaximale +
+                ", prixUnitaire=" + prixUnitaire +
                 ", derniereMaj=" + derniereMaj +
                 ", statut='" + statut + '\'' +
                 ", location='" + location + '\'' +

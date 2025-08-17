@@ -10,25 +10,28 @@ public class Publicite {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idPublicite;
 
+    @Column(nullable = false, length = 100)
     private String titre;
 
+    @Column(length = 500)
     private String description;
 
-    @Column(name = "type_publicite")
+    @Column(name = "type_publicite", length = 50)
     private String typePublicite;
 
+    @Column(length = 100)
     private String cible;
 
-    @Column(name = "image_url")
+    @Column(name = "image_url", length = 255)
     private String imageUrl;
 
-    @Column(name = "video_url")
+    @Column(name = "video_url", length = 255)
     private String videoUrl;
 
-    @Column(name = "date_debut")
+    @Column(name = "date_debut", nullable = false)
     private LocalDateTime dateDebut;
 
-    @Column(name = "date_fin")
+    @Column(name = "date_fin", nullable = false)
     private LocalDateTime dateFin;
 
     private Boolean active;
@@ -36,10 +39,10 @@ public class Publicite {
     @Column(name = "id_boutique", nullable = false)
     private Integer idBoutique;
 
-    @Column(columnDefinition = "JSON")
+    @Column(columnDefinition = "VARCHAR(255)") // Ajusté pour compatibilité
     private String statistiques;
 
-    @Column(name = "date_creation")
+    @Column(name = "date_creation", nullable = false)
     private LocalDateTime dateCreation;
 
     // Getters and Setters

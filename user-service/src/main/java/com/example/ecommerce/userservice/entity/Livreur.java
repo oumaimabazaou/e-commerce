@@ -6,9 +6,11 @@ import java.math.BigDecimal;
 @Entity
 @Table(name = "livreur")
 public class Livreur {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_livreur")
-    private String idLivreur;
+    private Long idLivreur; // Changé de String à Long
 
     @OneToOne
     @JoinColumn(name = "id_utilisateur")
@@ -22,10 +24,13 @@ public class Livreur {
     private BigDecimal noteMoyenne;
     private Integer nombreLivraisons;
     private String permisConduire;
-    // Getters, setters, constructeurs
 
-    public String getIdLivreur() { return idLivreur; }
-    public void setIdLivreur(String idLivreur) { this.idLivreur = idLivreur; }
+    // Constructeur par défaut
+    public Livreur() {}
+
+    // Getters et setters
+    public Long getIdLivreur() { return idLivreur; }
+    public void setIdLivreur(Long idLivreur) { this.idLivreur = idLivreur; }
     public Utilisateur getUtilisateur() { return utilisateur; }
     public void setUtilisateur(Utilisateur utilisateur) { this.utilisateur = utilisateur; }
     public String getTypeTransport() { return typeTransport; }
@@ -42,4 +47,4 @@ public class Livreur {
     public void setNombreLivraisons(Integer nombreLivraisons) { this.nombreLivraisons = nombreLivraisons; }
     public String getPermisConduire() { return permisConduire; }
     public void setPermisConduire(String permisConduire) { this.permisConduire = permisConduire; }
-} 
+}

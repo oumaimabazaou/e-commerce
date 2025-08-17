@@ -17,7 +17,7 @@ public class LivreurService {
         return livreurRepository.findAll();
     }
 
-    public Optional<Livreur> findById(String id) {
+    public Optional<Livreur> findById(Long id) { // Changé de String à Long
         return livreurRepository.findById(id);
     }
 
@@ -25,7 +25,7 @@ public class LivreurService {
         return livreurRepository.save(livreur);
     }
 
-    public void deleteById(String id) {
+    public void deleteById(Long id) { // Changé de String à Long
         livreurRepository.deleteById(id);
     }
-} 
+}

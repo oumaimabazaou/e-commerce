@@ -35,7 +35,7 @@
 
     <properties>
         <java.version>17</java.version>
-        <spring-cloud.version>2023.0.1</spring-cloud.version>
+        <spring-cloud.version>2023.0.4</spring-cloud.version>
     </properties>
 
     <dependencyManagement>
@@ -56,6 +56,7 @@
         <module>config-server</module>
         <module>user-service</module>
         <module>boutique-service</module>
+        <module>stock-service</module>
     </modules>
 
     <build>

@@ -20,7 +20,7 @@ public class ClientController {
     }
 
     @GetMapping("/{id}")
-    public Optional<Client> getById(@PathVariable String id) {
+    public Optional<Client> getById(@PathVariable Long id) { // Changé de String à Long
         return clientService.findById(id);
     }
 
@@ -30,13 +30,13 @@ public class ClientController {
     }
 
     @PutMapping("/{id}")
-    public Client update(@PathVariable String id, @RequestBody Client client) {
+    public Client update(@PathVariable Long id, @RequestBody Client client) { // Changé de String à Long
         client.setIdClient(id);
         return clientService.save(client);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable String id) {
+    public void delete(@PathVariable Long id) { // Changé de String à Long
         clientService.deleteById(id);
     }
-} 
+}
