@@ -1,3 +1,5 @@
+// Chemin: communication-service/src/main/java/com/example/communicationservice/service/MessageService.java
+
 package com.example.communicationservice.service;
 
 import com.example.communicationservice.entity.Message;
@@ -22,19 +24,22 @@ public class MessageService {
         return messageRepository.save(message);
     }
 
+    // CORRECTION : Ajout de la méthode pour récupérer tous les messages
+    public List<Message> getAllMessages() {
+        return messageRepository.findAll();
+    }
+
     public Optional<Message> getMessageById(Integer id) {
         return messageRepository.findById(id);
     }
 
     public List<Message> getMessagesByExpediteur(Integer idExpediteur) {
-        return messageRepository.findAll().stream()
-                .filter(m -> m.getIdExpediteur().equals(idExpediteur))
-                .toList();
+        // C'est mieux de créer une méthode dédiée dans le repository pour la performance
+        return messageRepository.findByIdExpediteur(idExpediteur);
     }
 
     public List<Message> getMessagesByDestinataire(Integer idDestinataire) {
-        return messageRepository.findAll().stream()
-                .filter(m -> m.getIdDestinataire().equals(idDestinataire))
-                .toList();
+        // C'est mieux de créer une méthode dédiée dans le repository pour la performance
+        return messageRepository.findByIdDestinataire(idDestinataire);
     }
 }

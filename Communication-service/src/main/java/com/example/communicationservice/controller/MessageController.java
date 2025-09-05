@@ -1,3 +1,5 @@
+// Chemin: communication-service/src/main/java/com/example/communicationservice/controller/MessageController.java
+
 package com.example.communicationservice.controller;
 
 import com.example.communicationservice.entity.Message;
@@ -18,6 +20,12 @@ public class MessageController {
     @PostMapping
     public ResponseEntity<Message> createMessage(@Valid @RequestBody Message message) {
         return ResponseEntity.ok(messageService.createMessage(message));
+    }
+
+    // CORRECTION : Ajout de la méthode pour GET /api/messages
+    @GetMapping
+    public ResponseEntity<List<Message>> getAllMessages() {
+        return ResponseEntity.ok(messageService.getAllMessages());
     }
 
     @GetMapping("/{id}")

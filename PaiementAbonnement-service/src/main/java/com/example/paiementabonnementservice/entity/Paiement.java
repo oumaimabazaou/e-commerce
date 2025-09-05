@@ -1,12 +1,9 @@
 package com.example.paiementabonnementservice.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-
 import java.time.LocalDateTime;
 
 @Entity
-@Data
 @Table(name = "paiement")
 public class Paiement {
     @Id
@@ -27,4 +24,53 @@ public class Paiement {
 
     @Column(name = "statut_paiement")
     private String statutPaiement;
+
+    // Getters and Setters
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Integer getIdAbonnement() {
+        return idAbonnement;
+    }
+
+    public void setIdAbonnement(Integer idAbonnement) {
+        this.idAbonnement = idAbonnement;
+    }
+
+    public Double getMontant() {
+        return montant;
+    }
+
+    public void setMontant(Double montant) {
+        this.montant = montant;
+    }
+
+    public String getMethodePaiement() {
+        return methodePaiement;
+    }
+
+    public void setMethodePaiement(String methodePaiement) {
+        this.methodePaiement = methodePaiement;
+    }
+
+    public LocalDateTime getDatePaiement() {
+        return datePaiement;
+    }
+
+    public void setDatePaiement(LocalDateTime datePaiement) {
+        this.datePaiement = datePaiement;
+    }
+
+    public String getStatutPaiement() {
+        return statutPaiement;
+    }
+
+    public void setStatutPaiement(String statutPaiement) {
+        this.statutPaiement = statutPaiement;
+    }
 }

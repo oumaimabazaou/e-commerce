@@ -6,12 +6,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/users") // Changé pour éviter le conflit avec /api/auth
+@RequestMapping("/api/users")
 public class UtilisateurController {
 
     @Autowired
@@ -20,52 +22,69 @@ public class UtilisateurController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    // Endpoints CRUD
     @GetMapping
     public ResponseEntity<List<Utilisateur>> getAll() {
         try {
-            return ResponseEntity.ok(utilisateurService.findAll());
+            List<Utilisateur> utilisateurs = utilisateurService.findAll(); // Corrélé à findAll dans UtilisateurService
+            return ResponseEntity.ok(utilisateurs);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(null);
+            return ResponseEntity.status(500).body(null); // À améliorer avec un message d'erreur
         }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Utilisateur> getById(@PathVariable Long id) {
         try {
-            Optional<Utilisateur> utilisateur = utilisateurService.findById(id);
-            return utilisateur.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+            return utilisateurService.findById(id) // Corrélé à findById dans UtilisateurService
+                    .map(ResponseEntity::ok)
+                    .orElseGet(() -> ResponseEntity.notFound().build());
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(null);
+            return ResponseEntity.status(500).body(null); // À améliorer avec un message d'erreur
         }
     }
 
     @PostMapping
-    public ResponseEntity<Utilisateur> create(@RequestBody Utilisateur utilisateur) {
+    public ResponseEntity<Utilisateur> create(@Valid @RequestBody Utilisateur utilisateur) {
         try {
-            return ResponseEntity.ok(utilisateurService.save(utilisateur));
+            if (utilisateur.getEmail() == null || utilisateur.getMotDePasse() == null) {
+                return ResponseEntity.badRequest().body(null);
+            }
+
+            utilisateur.setMotDePasse(passwordEncoder.encode(utilisateur.getMotDePasse()));
+            Utilisateur savedUtilisateur = utilisateurService.save(utilisateur); // Corrélé à save dans UtilisateurService
+
+            URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                    .path("/{id}")
+                    .buildAndExpand(savedUtilisateur.getIdUtilisateur())
+                    .toUri();
+            return ResponseEntity.created(location).body(savedUtilisateur);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(null); // À améliorer avec un message d'erreur
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Utilisateur> update(@PathVariable Long id, @RequestBody Utilisateur utilisateur) {
+    public ResponseEntity<Utilisateur> update(@PathVariable Long id, @Valid @RequestBody Utilisateur utilisateur) {
         try {
-            if (utilisateur.getIdUtilisateur() == null || !utilisateur.getIdUtilisateur().equals(id)) {
-                utilisateur.setIdUtilisateur(id);
+            if (!id.equals(utilisateur.getIdUtilisateur())) {
+                return ResponseEntity.badRequest().body(null);
             }
-            return ResponseEntity.ok(utilisateurService.save(utilisateur));
+
+            if (utilisateur.getMotDePasse() != null && !utilisateur.getMotDePasse().isEmpty()) {
+                utilisateur.setMotDePasse(passwordEncoder.encode(utilisateur.getMotDePasse()));
+            }
+            Utilisateur updatedUtilisateur = utilisateurService.save(utilisateur); // Corrélé à save dans UtilisateurService
+            return ResponseEntity.ok(updatedUtilisateur);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(null); // À améliorer avec un message d'erreur
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {
-            utilisateurService.deleteById(id);
-            return ResponseEntity.ok().build();
+            utilisateurService.deleteById(id); // Corrélé à deleteById dans UtilisateurService
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }

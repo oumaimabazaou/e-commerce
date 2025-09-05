@@ -1,3 +1,5 @@
+// Chemin: commande-service/src/main/java/com/example/commandeservice/service/CommandeServiceImpl.java
+
 package com.example.commandeservice.service;
 
 import com.example.commandeservice.entity.Commande;
@@ -6,6 +8,7 @@ import com.example.commandeservice.repository.CommandeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +16,22 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+// On doit définir la classe Notification pour qu'elle soit utilisable
+class Notification {
+    private String type;
+    private Object data;
+
+    public Notification(String type, Object data) {
+        this.type = type;
+        this.data = data;
+    }
+
+    // Getters nécessaires pour la sérialisation JSON
+    public String getType() { return type; }
+    public Object getData() { return data; }
+}
+
 
 @Service
 public class CommandeServiceImpl implements CommandeService {
@@ -22,12 +41,14 @@ public class CommandeServiceImpl implements CommandeService {
     @Autowired
     private CommandeRepository commandeRepository;
 
+    @Autowired
+    private SimpMessagingTemplate messagingTemplate;
+
     @Override
     @Transactional
     public Commande createCommande(Commande commande) {
         logger.info("Tentative de création de la commande : {}", commande);
         try {
-            // Vérification des champs obligatoires
             if (commande.getIdClient() == null || commande.getIdClient().trim().isEmpty()) {
                 throw new IllegalArgumentException("idClient est obligatoire");
             }
@@ -35,11 +56,9 @@ public class CommandeServiceImpl implements CommandeService {
                 throw new IllegalArgumentException("statut est obligatoire");
             }
 
-            // Initialiser les timestamps
             commande.setCreatedAt(LocalDateTime.now());
             commande.setUpdatedAt(LocalDateTime.now());
 
-            // Gérer ligneCommandes
             if (commande.getLigneCommandes() == null) {
                 commande.setLigneCommandes(Collections.emptyList());
             } else {
@@ -53,20 +72,19 @@ public class CommandeServiceImpl implements CommandeService {
                     if (ligne.getPrixUnitaire() == null || ligne.getPrixUnitaire() <= 0) {
                         throw new IllegalArgumentException("prixUnitaire doit être positif");
                     }
-                    if (ligne.getCommande() == null) {
-                        ligne.setCommande(commande);
-                    }
-                    // Calculer sousTotal pour chaque ligne
+                    ligne.setCommande(commande); // Assurer la liaison bidirectionnelle
                     ligne.setSousTotal(ligne.getQuantite() * ligne.getPrixUnitaire());
                 }
             }
 
-            // Calculer le total
             double total = calculateTotal(commande);
-            commande.setTotal(total);
+            commande.setMontantTotal(total); // S'assurer que le bon champ est mis à jour
 
             Commande savedCommande = commandeRepository.save(commande);
             logger.info("Commande créée avec succès : {}", savedCommande);
+
+            notifyVendor(savedCommande.getIdBoutique(), "new_order", savedCommande);
+
             return savedCommande;
         } catch (Exception e) {
             logger.error("Erreur lors de la création de la commande : ", e);
@@ -81,24 +99,25 @@ public class CommandeServiceImpl implements CommandeService {
 
     @Override
     public List<Commande> getAllCommandes(String statut) {
-        return (statut != null && !statut.isEmpty()) ? commandeRepository.findByStatut(statut) : commandeRepository.findAll();
+        if (statut != null && !statut.isEmpty()) {
+            return commandeRepository.findByStatut(statut);
+        }
+        return commandeRepository.findAll();
     }
 
     @Override
     @Transactional
-    public Commande updateCommande(Integer id, Commande commande) {
+    public Commande updateCommande(Integer id, Commande commandeDetails) {
         Commande existingCommande = commandeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Commande non trouvée avec l'ID : " + id));
-        existingCommande.setStatut(commande.getStatut() != null ? commande.getStatut() : existingCommande.getStatut());
-        existingCommande.setUpdatedAt(LocalDateTime.now());
-        if (commande.getLigneCommandes() != null) {
-            existingCommande.setLigneCommandes(commande.getLigneCommandes());
-            existingCommande.getLigneCommandes().forEach(ligne -> {
-                if (ligne.getCommande() == null) ligne.setCommande(existingCommande);
-            });
+
+        if (commandeDetails.getStatut() != null) {
+            existingCommande.setStatut(commandeDetails.getStatut());
         }
-        double total = calculateTotal(existingCommande);
-        existingCommande.setTotal(total);
+        existingCommande.setUpdatedAt(LocalDateTime.now());
+
+        // ... (ajouter d'autres logiques de mise à jour si nécessaire)
+
         return commandeRepository.save(existingCommande);
     }
 
@@ -112,13 +131,47 @@ public class CommandeServiceImpl implements CommandeService {
         return commandeRepository.findByIdClient(clientId);
     }
 
+    // CORRECTION : IMPLÉMENTATION DE LA MÉTHODE MANQUANTE
+    @Override
+    public List<Commande> getCommandesByBoutique(Integer boutiqueId) {
+        return commandeRepository.findByIdBoutique(boutiqueId);
+    }
+
+    @Override
+    @Transactional
+    public void markPayment(String idCommande) {
+        Commande commande = commandeRepository.findById(Integer.parseInt(idCommande))
+                .orElseThrow(() -> new RuntimeException("Commande non trouvée avec l'ID : " + idCommande));
+        commande.setStatut("Payée");
+        commande.setUpdatedAt(LocalDateTime.now());
+        commandeRepository.save(commande);
+        notifyVendor(commande.getIdBoutique(), "payment", idCommande);
+    }
+
     private double calculateTotal(Commande commande) {
-        double ligneTotal = (commande.getLigneCommandes() != null)
-                ? commande.getLigneCommandes().stream()
-                .mapToDouble(ligne -> ligne.getSousTotal() != null ? ligne.getSousTotal() : 0.0)
-                .sum()
-                : 0.0;
-        double shippingFee = commande.getShippingFee() != null ? commande.getShippingFee() : 0.0;
+        double ligneTotal = 0.0;
+        if (commande.getLigneCommandes() != null) {
+            ligneTotal = commande.getLigneCommandes().stream()
+                    .mapToDouble(ligne -> ligne.getSousTotal() != null ? ligne.getSousTotal() : 0.0)
+                    .sum();
+        }
+        double shippingFee = commande.getFraisLivraison() != null ? commande.getFraisLivraison() : 0.0;
         return ligneTotal + shippingFee;
+    }
+
+    private void notifyVendor(Integer boutiqueId, String type, Object data) {
+        // Cette logique doit être améliorée pour trouver le vrai ID du vendeur
+        // Par exemple, en faisant un appel à un 'boutique-service'
+        String vendeurId = getVendeurIdFromBoutique(boutiqueId);
+        if (vendeurId != null) {
+            messagingTemplate.convertAndSend("/topic/vendor/" + vendeurId, new Notification(type, data));
+        } else {
+            logger.warn("Aucun vendeur trouvé pour la boutique ID: {}", boutiqueId);
+        }
+    }
+
+    private String getVendeurIdFromBoutique(Integer boutiqueId) {
+
+        return "vendeur1";
     }
 }

@@ -4,11 +4,14 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,11 +22,20 @@ public class JwtTokenProvider {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
-    // Générer une clé sécurisée au démarrage (64 bytes pour HS512)
-    private final SecretKey secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+    @Value("${app.jwt-secret}")
+    private String jwtSecretString;
 
-    // Utiliser une durée d'expiration par défaut (1 jour en millisecondes)
-    private final int jwtExpirationInMs = 86400000;
+    @Value("${app.jwt-expiration-milliseconds}")
+    private int jwtExpirationInMs;
+
+    private SecretKey secretKey;
+
+    @PostConstruct
+    public void init() {
+        // Utilise Keys.secretKeyFor pour garantir une clé sécurisée pour HS512
+        this.secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+        logger.info("Clé JWT initialisée avec une taille sécurisée pour HS512.");
+    }
 
     public String generateToken(String username, String role) {
         Map<String, Object> claims = new HashMap<>();
@@ -34,7 +46,6 @@ public class JwtTokenProvider {
     private String createToken(Map<String, Object> claims, String subject) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
-
         return Jwts.builder()
                 .claims(claims)
                 .subject(subject)
@@ -78,7 +89,7 @@ public class JwtTokenProvider {
             final String extractedUsername = extractUsername(token);
             return (extractedUsername.equals(username) && !isTokenExpired(token));
         } catch (Exception e) {
-            logger.error("Erreur lors de la validation du token : {}", e.getMessage());
+            logger.error("Erreur de validation du token : {}", e.getMessage());
             return false;
         }
     }

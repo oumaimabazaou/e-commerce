@@ -1,3 +1,4 @@
+// Chemin: commande-service/src/main/java/com/example/commandeservice/controller/LigneCommandeController.java
 package com.example.commandeservice.controller;
 
 import com.example.commandeservice.entity.LigneCommande;
@@ -22,22 +23,22 @@ public class LigneCommandeController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<LigneCommande>> getLigneCommandeById(@PathVariable Integer id) {
+    public ResponseEntity<Optional<LigneCommande>> getLigneCommandeById(@PathVariable Integer id) { // <-- CORRECTION
         return ResponseEntity.ok(ligneCommandeService.getLigneCommandeById(id));
     }
 
     @GetMapping("/commande/{commandeId}")
-    public ResponseEntity<List<LigneCommande>> getLigneCommandesByCommande(@PathVariable Integer commandeId) {
+    public ResponseEntity<List<LigneCommande>> getLigneCommandesByCommande(@PathVariable Integer commandeId) { // <-- CORRECTION
         return ResponseEntity.ok(ligneCommandeService.getLigneCommandesByCommande(commandeId));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<LigneCommande> updateLigneCommande(@PathVariable Integer id, @Valid @RequestBody LigneCommande ligneCommande) {
+    public ResponseEntity<LigneCommande> updateLigneCommande(@PathVariable Integer id, @Valid @RequestBody LigneCommande ligneCommande) { // <-- CORRECTION
         return ResponseEntity.ok(ligneCommandeService.updateLigneCommande(id, ligneCommande));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteLigneCommande(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteLigneCommande(@PathVariable Integer id) { // <-- CORRECTION
         ligneCommandeService.deleteLigneCommande(id);
         return ResponseEntity.noContent().build();
     }

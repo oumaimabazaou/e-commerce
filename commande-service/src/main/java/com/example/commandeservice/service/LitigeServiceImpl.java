@@ -1,3 +1,4 @@
+// CHEMIN : commande-service/src/main/java/com/example/commandeservice/service/LitigeServiceImpl.java
 package com.example.commandeservice.service;
 
 import com.example.commandeservice.entity.Litige;
@@ -30,15 +31,16 @@ public class LitigeServiceImpl implements LitigeService {
 
     @Override
     public List<Litige> getLitigesByCommande(Integer commandeId) {
-        return litigeRepository.findByCommande_IdCommande(commandeId);
+        // CORRECTION : Appel de la méthode avec le nom corrigé du repository.
+        return litigeRepository.findByCommandeId(commandeId);
     }
 
     @Override
     @Transactional
-    public Litige updateLitige(Integer id, Litige litige) {
+    public Litige updateLitige(Integer id, Litige litigeDetails) {
         Litige existing = litigeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Litige non trouvé"));
-        existing.setDescription(litige.getDescription());
+        existing.setDescription(litigeDetails.getDescription());
         return litigeRepository.save(existing);
     }
 

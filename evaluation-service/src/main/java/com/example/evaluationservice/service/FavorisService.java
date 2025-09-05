@@ -31,12 +31,6 @@ public class FavorisService {
         return favorisRepository.findById(id);
     }
 
-    public List<Favoris> getFavorisByUtilisateur(Integer idUtilisateur) {
-        return favorisRepository.findAll().stream()
-                .filter(f -> f.getIdUtilisateur().equals(idUtilisateur))
-                .toList();
-    }
-
     public List<Favoris> getFavorisByEntite(Integer idEntiteFavoree) {
         return favorisRepository.findAll().stream()
                 .filter(f -> f.getIdEntiteFavoree().equals(idEntiteFavoree))
@@ -46,4 +40,10 @@ public class FavorisService {
     public List<Favoris> getAllFavoris() {
         return favorisRepository.findAll();
     }
+    public List<Favoris> getFavorisByUtilisateur(Long idUtilisateur) {
+        return favorisRepository.findAll().stream()
+                .filter(f -> f.getIdUtilisateur().equals(idUtilisateur))
+                .toList();
+    }
+
 }

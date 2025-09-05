@@ -1,3 +1,4 @@
+// Chemin: commande-service/src/main/java/com/example/commandeservice/service/LigneCommandeServiceImpl.java
 package com.example.commandeservice.service;
 
 import com.example.commandeservice.entity.LigneCommande;
@@ -22,18 +23,18 @@ public class LigneCommandeServiceImpl implements LigneCommandeService {
     }
 
     @Override
-    public Optional<LigneCommande> getLigneCommandeById(Integer id) {
+    public Optional<LigneCommande> getLigneCommandeById(Integer id) { // <-- CORRECTION
         return ligneCommandeRepository.findById(id);
     }
 
     @Override
-    public List<LigneCommande> getLigneCommandesByCommande(Integer commandeId) {
-        return ligneCommandeRepository.findByCommande_IdCommande(commandeId);
+    public List<LigneCommande> getLigneCommandesByCommande(Integer commandeId) { // <-- CORRECTION
+        return ligneCommandeRepository.findByCommandeId(commandeId); // Appel de la méthode corrigée
     }
 
     @Override
     @Transactional
-    public LigneCommande updateLigneCommande(Integer id, LigneCommande ligneCommande) {
+    public LigneCommande updateLigneCommande(Integer id, LigneCommande ligneCommande) { // <-- CORRECTION
         LigneCommande existing = ligneCommandeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Ligne de commande non trouvée"));
         existing.setQuantite(ligneCommande.getQuantite());
@@ -43,7 +44,7 @@ public class LigneCommandeServiceImpl implements LigneCommandeService {
     }
 
     @Override
-    public void deleteLigneCommande(Integer id) {
+    public void deleteLigneCommande(Integer id) { // <-- CORRECTION
         ligneCommandeRepository.deleteById(id);
     }
 }

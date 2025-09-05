@@ -11,12 +11,15 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 public class SecurityConfig {
 
     @Bean
-    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+    public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         return http
-                .csrf(csrf -> csrf.disable())
-                .authorizeExchange(exchanges -> exchanges
-                        .anyExchange().permitAll()
-                )
+                // <CHANGE> Commentez ou supprimez cette section qui force HTTPS
+                /*
+                .requiresChannel(channel ->
+                    channel.requestMatchers(r -> r.getHeaders().containsKey("X-Forwarded-Proto"))
+                           .requiresSecure())
+                */
+                .csrf().disable()
                 .build();
     }
 }

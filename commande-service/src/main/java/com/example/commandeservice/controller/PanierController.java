@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -46,5 +47,67 @@ public class PanierController {
     public ResponseEntity<Void> clearPanier(@PathVariable String clientId) {
         panierService.clearPanier(clientId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/ajouter")
+    public ResponseEntity<?> ajouterAuPanier(@RequestBody Map<String, Object> request) {
+        try {
+            String idClient = (String) request.get("idClient");
+            Integer idProduit = (Integer) request.get("idProduit");
+            Integer quantite = (Integer) request.get("quantite");
+
+            // ✅ VÉRIFIER QUE LES CHAMPS OBLIGATOIRES EXISTENT
+            if (idClient == null || idProduit == null || quantite == null) {
+                return ResponseEntity.badRequest().body(Map.of(
+                        "success", false,
+                        "message", "Champs obligatoires manquants: idClient, idProduit, quantite"
+                ));
+            }
+
+            Panier panier = new Panier();
+            panier.setIdClient(idClient);
+            panier.setIdProduit(idProduit);
+            panier.setQuantite(quantite);
+
+            // ✅ GÉRER LES CHAMPS OPTIONNELS AVEC VALEURS PAR DÉFAUT
+            Object nomProduitObj = request.get("nomProduit");
+            panier.setNomProduit(nomProduitObj != null ? (String) nomProduitObj : "Produit " + idProduit);
+
+            Object prixObj = request.get("prix");
+            panier.setPrix(prixObj != null ? ((Number) prixObj).doubleValue() : 0.0);
+
+            Object imageObj = request.get("imageUrlrecoit");
+            panier.setImageUrlrecoit(imageObj != null ? (String) imageObj : "");
+
+            Object categorieObj = request.get("categorie");
+            panier.setCategorie(categorieObj != null ? (String) categorieObj : "General");
+
+            Panier savedPanier = panierService.addToPanier(panier);
+            return ResponseEntity.ok(Map.of("success", true, "data", savedPanier, "message", "Produit ajouté au panier"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        }
+    }
+    @GetMapping("/client/{clientId}/enrichi")
+    public ResponseEntity<Map<String, Object>> getPanierEnrichiByClient(@PathVariable String clientId) {
+        try {
+            List<Panier> paniers = panierService.getPaniersByClient(clientId);
+
+            return ResponseEntity.ok(Map.of(
+                    "success", true,
+                    "data", paniers,
+                    "message", "Panier récupéré avec données enrichies"
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "success", false,
+                    "message", "Erreur: " + e.getMessage()
+            ));
+        }
+    }
+    @GetMapping
+    public ResponseEntity<List<Panier>> getAllPaniers() {
+        List<Panier> paniers = panierService.getAllPaniers();
+        return ResponseEntity.ok(paniers);
     }
 }

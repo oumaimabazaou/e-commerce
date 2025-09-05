@@ -1,8 +1,6 @@
 package com.example.ecommerce.userservice.entity;
 
 import jakarta.persistence.*;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "vendeur")
@@ -11,21 +9,17 @@ public class Vendeur {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_vendeur")
-    private Long idVendeur; // Changé de String à Long
+    private Long idVendeur;
 
-    @OneToOne
-    @JoinColumn(name = "id_utilisateur")
+    @OneToOne(cascade = CascadeType.ALL) // Optionnel : ajuste selon votre besoin
+    @JoinColumn(name = "id_utilisateur", referencedColumnName = "id_utilisateur")
     private Utilisateur utilisateur;
 
     private String numeroIce;
     private String numeroPatente;
     private String statutFiscal;
-    private BigDecimal chiffreAffaires;
-    private LocalDateTime dateVerification;
+    private Double chiffreAffaires; // Changer en Double si nécessaire
     private Boolean verifie;
-
-    // Constructeur par défaut
-    public Vendeur() {}
 
     // Getters et setters
     public Long getIdVendeur() { return idVendeur; }
@@ -38,10 +32,8 @@ public class Vendeur {
     public void setNumeroPatente(String numeroPatente) { this.numeroPatente = numeroPatente; }
     public String getStatutFiscal() { return statutFiscal; }
     public void setStatutFiscal(String statutFiscal) { this.statutFiscal = statutFiscal; }
-    public BigDecimal getChiffreAffaires() { return chiffreAffaires; }
-    public void setChiffreAffaires(BigDecimal chiffreAffaires) { this.chiffreAffaires = chiffreAffaires; }
-    public LocalDateTime getDateVerification() { return dateVerification; }
-    public void setDateVerification(LocalDateTime dateVerification) { this.dateVerification = dateVerification; }
+    public Double getChiffreAffaires() { return chiffreAffaires; }
+    public void setChiffreAffaires(Double chiffreAffaires) { this.chiffreAffaires = chiffreAffaires; }
     public Boolean getVerifie() { return verifie; }
     public void setVerifie(Boolean verifie) { this.verifie = verifie; }
 }

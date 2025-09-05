@@ -25,6 +25,7 @@ public class CommandeController {
             return ResponseEntity.status(500).body("Erreur lors de la création : " + e.getMessage());
         }
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<Optional<Commande>> getCommandeById(@PathVariable Integer id) {
         return ResponseEntity.ok(commandeService.getCommandeById(id));
@@ -34,6 +35,7 @@ public class CommandeController {
     public ResponseEntity<List<Commande>> getAllCommandes(@RequestParam(required = false) String statut) {
         return ResponseEntity.ok(commandeService.getAllCommandes(statut));
     }
+
 
     @GetMapping("/client/{clientId}")
     public ResponseEntity<List<Commande>> getCommandesByClient(@PathVariable String clientId) {
@@ -49,5 +51,15 @@ public class CommandeController {
     public ResponseEntity<Void> deleteCommande(@PathVariable Integer id) {
         commandeService.deleteCommande(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{idCommande}/pay")
+    public ResponseEntity<Void> markPayment(@PathVariable String idCommande) {
+        commandeService.markPayment(idCommande);
+        return ResponseEntity.ok().build();
+    }
+    @GetMapping("/boutique/{boutiqueId}")
+    public ResponseEntity<List<Commande>> getCommandesByBoutique(@PathVariable Integer boutiqueId) {
+        return ResponseEntity.ok(commandeService.getCommandesByBoutique(boutiqueId));
     }
 }

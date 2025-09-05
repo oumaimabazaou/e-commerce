@@ -31,13 +31,14 @@ public class FavorisController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/utilisateur/{idUtilisateur}")
-    public ResponseEntity<List<Favoris>> getFavorisByUtilisateur(@PathVariable Integer idUtilisateur) {
-        return ResponseEntity.ok(favorisService.getFavorisByUtilisateur(idUtilisateur));
-    }
-
     @GetMapping("/entite/{idEntiteFavoree}")
     public ResponseEntity<List<Favoris>> getFavorisByEntite(@PathVariable Integer idEntiteFavoree) {
         return ResponseEntity.ok(favorisService.getFavorisByEntite(idEntiteFavoree));
     }
+
+    @GetMapping("/utilisateur/{idUtilisateur}")
+    public ResponseEntity<List<Favoris>> getFavorisByUtilisateur(@PathVariable Long idUtilisateur) {
+        return ResponseEntity.ok(favorisService.getFavorisByUtilisateur(idUtilisateur));
+    }
+
 }

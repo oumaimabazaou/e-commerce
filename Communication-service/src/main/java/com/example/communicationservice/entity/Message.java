@@ -2,11 +2,9 @@ package com.example.communicationservice.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
 import java.time.LocalDateTime;
 
 @Entity
-@Data
 @Table(name = "message")
 public class Message {
     @Id
@@ -27,4 +25,23 @@ public class Message {
 
     private LocalDateTime dateEnvoi;
     private String statut;
+
+    // Getters and Setters
+    public Integer getIdMessage() { return idMessage; }
+    public void setIdMessage(Integer idMessage) { this.idMessage = idMessage; }
+
+    public Integer getIdExpediteur() { return idExpediteur; }
+    public void setIdExpediteur(Integer idExpediteur) { this.idExpediteur = idExpediteur; }
+
+    public Integer getIdDestinataire() { return idDestinataire; }
+    public void setIdDestinataire(Integer idDestinataire) { this.idDestinataire = idDestinataire; }
+
+    public String getContenu() { return contenu; }
+    public void setContenu(String contenu) { this.contenu = contenu; }
+
+    public LocalDateTime getDateEnvoi() { return dateEnvoi; }
+    public void setDateEnvoi(LocalDateTime dateEnvoi) { this.dateEnvoi = dateEnvoi; }
+
+    public String getStatut() { return statut; }
+    public void setStatut(String statut) { this.statut = statut; }
 }

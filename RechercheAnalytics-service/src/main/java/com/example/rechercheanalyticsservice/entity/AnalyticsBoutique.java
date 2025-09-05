@@ -1,11 +1,9 @@
 package com.example.rechercheanalyticsservice.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import java.time.LocalDateTime;
 
 @Entity
-@Data
 @Table(name = "analytics_boutique")
 public class AnalyticsBoutique {
     @Id
@@ -26,4 +24,53 @@ public class AnalyticsBoutique {
 
     @Column(name = "periode")
     private String periode; // Ex. "Mensuelle", "Hebdomadaire"
+
+    // Getters and Setters
+    public Integer getIdAnalytics() {
+        return idAnalytics;
+    }
+
+    public void setIdAnalytics(Integer idAnalytics) {
+        this.idAnalytics = idAnalytics;
+    }
+
+    public Integer getIdBoutique() {
+        return idBoutique;
+    }
+
+    public void setIdBoutique(Integer idBoutique) {
+        this.idBoutique = idBoutique;
+    }
+
+    public Integer getNombreVisites() {
+        return nombreVisites;
+    }
+
+    public void setNombreVisites(Integer nombreVisites) {
+        this.nombreVisites = nombreVisites;
+    }
+
+    public Double getChiffreAffaires() {
+        return chiffreAffaires;
+    }
+
+    public void setChiffreAffaires(Double chiffreAffaires) {
+        this.chiffreAffaires = chiffreAffaires;
+    }
+
+    public LocalDateTime getDateAnalyse() {
+        return dateAnalyse;
+    }
+
+    public void setDateAnalyse(LocalDateTime dateAnalyse) {
+        this.dateAnalyse = dateAnalyse;
+    }
+
+    public String getPeriode() {
+        return periode;
+    }
+
+    public void setPeriode(String periode) {
+        this.periode = periode;
+    }
 }

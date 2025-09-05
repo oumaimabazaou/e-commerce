@@ -19,6 +19,7 @@
             <version>3.5.3</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <parent>
@@ -57,6 +58,12 @@
         <module>user-service</module>
         <module>boutique-service</module>
         <module>stock-service</module>
+        <module>commande-service</module>
+        <module>Communication-service</module>
+        <module>evaluation-service</module>
+        <module>Livraison-service</module>
+        <module>PaiementAbonnement-service</module>
+        <module>RechercheAnalytics-service</module>
     </modules>
 
     <build>

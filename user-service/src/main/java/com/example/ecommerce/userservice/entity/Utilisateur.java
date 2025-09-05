@@ -15,6 +15,7 @@ public class Utilisateur {
 
     private String nom;
     private String prenom;
+    private String adresse;
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -68,7 +69,7 @@ public class Utilisateur {
 
     // Getters et setters
     public Long getIdUtilisateur() { return idUtilisateur; }
-    public void setIdUtilisateur(Long idUtilisateurl) { this.idUtilisateur = idUtilisateur; }
+    public void setIdUtilisateur(Long idUtilisateur) { this.idUtilisateur = idUtilisateur; }
     public String getNom() { return nom; }
     public void setNom(String nom) { this.nom = nom; }
     public String getPrenom() { return prenom; }
@@ -101,4 +102,6 @@ public class Utilisateur {
     public void setPays(String pays) { this.pays = pays; }
     public String getPhotoProfil() { return photoProfil; }
     public void setPhotoProfil(String photoProfil) { this.photoProfil = photoProfil; }
+    public String getAdresse() { return adresse; }
+    public void setAdresse(String adresse) { this.adresse = adresse; }
 }

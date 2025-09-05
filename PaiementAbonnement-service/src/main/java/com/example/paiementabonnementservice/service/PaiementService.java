@@ -32,8 +32,15 @@ public class PaiementService {
         return paiementRepository.findById(id);
     }
 
+    public List<Paiement> getAllPaiements() {
+        return paiementRepository.findAll();
+    }
+
     public List<Paiement> getPaiementsByAbonnement(Integer idAbonnement) {
-        // Remplacer par une requête spécifique (nécessite une mise à jour du repository)
-        return paiementRepository.findByIdAbonnement(idAbonnement); // À implémenter dans le repository
+        return paiementRepository.findByIdAbonnement(idAbonnement);
+    }
+
+    public void markPayment(String idCommande) {
+        System.out.println("Paiement marqué pour la commande : " + idCommande);
     }
 }
